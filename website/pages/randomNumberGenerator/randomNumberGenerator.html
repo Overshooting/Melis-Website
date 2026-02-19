@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Random Number Generator - Melis Website</title>
+  <link rel="stylesheet" href="/generalStyle.css">
+  <link rel="stylesheet" href="/pages/randomNumberGenerator/randomNumberGeneratorStyle.css">
+</head>
+<body>
+    <button id = "homeBtn" class="homeBtn">Home</button>
+    <h1>Random Number Generator</h1>
+    <p>Click the button to generate a random number!</p>
+    <div class="randomNumberGeneratorButtonsContainer">
+      <button id="generateBtn" type="button">Generate Random Number</button>
+      <p class="randomNumberDisplay">Random Number: <span id="randomNumberDisplay" aria-live="polite"></span></p>
+      <div class="minMaxContainer">
+        <input id="minInput" type="text" placeholder="Minimum" class="numberInput"/>
+        <input id="maxInput" type="text" placeholder="Maximum" class="numberInput"/>
+      </div>
+    </div>
+    <script src="/functions/pages/randomNumberGenerator/randomNumberButton.js"></script>
+    <script src="/functions/homeButton.js"></script>
+</body>
+</html>

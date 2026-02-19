@@ -1,0 +1,42 @@
+.backBtn {
+    background-color: #008cba;
+    align-self: center;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.backBtn:hover {
+    background-color: #005f5f;
+}
+
+.adminButtonsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.deleteAccountBtn {
+    background-color: #ff1100;
+}
+
+.deleteAccountBtn:hover {
+    background-color: #b91300;
+}
+
+.adminOutputDisplay {
+    margin-top: 5px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.textInput {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+}

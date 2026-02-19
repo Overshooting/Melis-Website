@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Help - Melis Website</title>
+  <link rel="stylesheet" href="/generalStyle.css">
+  <link rel="stylesheet" href="/pages/accounts/adminhelp/adminhelpStyle.css">
+</head>
+<body>
+    <button id = "homeBtn" class="homeBtn">Home</button>
+    <button id = "backBtn" class="backBtn">Back</button>
+    <h1>Admin Help</h1>
+    <div class="adminButtonsContainer">
+      <p class="adminOutputDisplay"><span id="adminOutputDisplay" aria-live="polite"></span></p>
+      <input id="usernameInput" type="text" placeholder="Username" class="textInput"/>
+      <input id="passwordInput" type="text" placeholder="Password" class="textInput"/>
+      <button id="deleteAccountBtn" class="deleteAccountBtn">Delete Account</button>
+    </div>
+    <script src="/functions/homeButton.js"></script>
+    <script src="/functions/pages/accounts/adminhelp/backButton.js"></script>
+    <script src="/functions/pages/accounts/adminhelp/deleteAccountButton.js"></script>
+</body>
+</html>

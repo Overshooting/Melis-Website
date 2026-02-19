@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Account Manager - Melis Website</title>
+  <link rel="stylesheet" href="/generalStyle.css">
+  <link rel="stylesheet" href="/pages/accounts/accountsStyle.css">
+</head>
+<body>
+    <button id = "homeBtn" class="homeBtn">Home</button>
+    <button id = "helpBtn" class="helpBtn">Admin Help</button>
+    <h1>Valorant Account Manager</h1>
+    <div id="accountsTableContainer" class="accountsTableContainer">Loading accounts...</div>
+    <p class="accountsOutputDisplay"><span id="outputDisplay" aria-live="polite"></span></p>
+    <div class="accountsButtonsContainer">
+      <div class="accountFunctionContainer">
+        <input id="addUsernameInput" type="text" placeholder="Username" class="textInput"/>
+        <input id="addPasswordInput" type="text" placeholder="Password" class="textInput"/>
+        <button id="addAccountBtn" class="addAccountBtn">Add Account</button>
+      </div>
+      <div class="accountFunctionContainer">
+        <input id="deleteUsernameInput" type="text" placeholder="Username" class="textInput"/>
+        <input id="deletePasswordInput" type="text" placeholder="Password" class="textInput"/>
+        <button id="deleteAccountBtn" class="deleteAccountBtn">Delete Account</button>
+      </div>
+      <div class="accountFunctionContainer">
+        <input id="claimUsernameInput" type="text" placeholder="Username" class="textInput"/>
+        <input id="claimNameInput" type="text" placeholder="Name" class="textInput"/>
+        <input id="claimPasswordInput" type="text" placeholder="Password" class="textInput"/>
+        <button id="claimAccountBtn" class="claimAccountBtn">Claim Account</button>
+      </div>
+    </div>
+    <script src="/functions/pages/accounts/accountsTable.js"></script>
+    <script src="/functions/homeButton.js"></script>
+    <script src="/functions/pages/accounts/addAccountButton.js"></script>
+    <script src="/functions/pages/accounts/deleteAccountButton.js"></script>
+    <script src="/functions/pages/accounts/claimAccountButton.js"></script>
+    <script src="functions/pages/accounts/adminHelpButton.js"></script>
+</body>
+</html>
