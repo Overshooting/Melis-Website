@@ -1,4 +1,3 @@
-const express = require('express');
 const pino = require('pino');
 const fs = require('fs');
 const path = require('path');

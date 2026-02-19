@@ -1,7 +1,6 @@
 const { server, PORT } = require('../server/server');
 const { startTunnel, stopTunnel } = require('./tunnelSetup');
 const logger = require('../server/customLogger');
-const argon2 = require('argon2');
 
 async function startServer() {
     let domain = `http://localhost:${PORT}`;

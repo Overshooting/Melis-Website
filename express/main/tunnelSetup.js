@@ -1,8 +1,5 @@
-const PORT = process.env.PORT;
 const logger = require('../server/customLogger');
 const { spawn } = require('child_process');
-const { match } = require('assert');
-const { error } = require('console');
 
 let tunnelProcess = null;
 
@@ -27,7 +24,6 @@ function startTunnel(localUrl) {
                 resolved = true;
 
                 logger.info('Cloudflared tunnel resolved to: ' + match[0]);
-
 
                 resolve(match[0]);
             }
