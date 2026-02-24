@@ -25,7 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
       display.textContent = 'Invalid maximum value!';
     }
 
-    const number = Math.round(Math.random() * max) + min; 
-    display.textContent = number.toLocaleString('en-US');
+    const number = Math.round(Math.random() * (max - min)) + min; 
+    if (max >= min) {
+      display.textContent = number.toLocaleString('en-US');
+    } else {
+      display.textContent = 'Invalid inputs!';
+    }
+    
   });
 });

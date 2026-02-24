@@ -1,4 +1,4 @@
-const logger = require('../server/customLogger');
+const logger = require('./customLogger');
 const { spawn } = require('child_process');
 
 let tunnelProcess = null;

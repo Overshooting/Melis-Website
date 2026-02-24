@@ -5,7 +5,7 @@ const cors = require('cors');
 const ratelimit = require('express-rate-limit');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const logger = require('./customLogger');
+const logger = require('../services/customLogger');
 
 const accountsRouter = require('../routes/website/accounts');
 const homeRouter = require('../routes/website/home');
