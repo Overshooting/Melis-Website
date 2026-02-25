@@ -128,3 +128,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+express/routes/website/williamwebsite
+express/routes/api/williamwebsite
+website/functions/williamwebsite
+website/pages/williamwebsite

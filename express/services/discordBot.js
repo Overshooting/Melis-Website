@@ -167,7 +167,6 @@ async function sendSuggestionEmbed(suggestion, name) {
             const thisSuggestionMessage = await channel.send({ embeds: [embed] });
             await thisSuggestionMessage.react('✅');
             await thisSuggestionMessage.react('❌');
-            await thisSuggestionMessage.react(':gas:');
         } catch (err) {
             logger.info(`Failed to send suggestion embed to guild ${guild.id}:`, err);
         }
