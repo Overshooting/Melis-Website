@@ -1,0 +1,50 @@
+.inputContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 20px;
+    align-items: center;
+}
+
+.suggestionInputLabel {
+    font-weight: bold;
+}
+
+.nameInput {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    min-width: 100px;
+}
+
+.suggestionInput {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    min-width: 300px;
+    min-height: 100px;
+    resize: vertical;
+}
+
+.submitSuggestionButton {
+    padding: 10px 20px;
+    background-color: #0066ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.submitSuggestionButton:hover {
+    background-color: #004cbb;
+}
+
+.responseMessage {
+    margin-top: 20px;
+    font-size: 16px;
+    min-width: 200px;
+}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Submit a Suggestion</title>
+  <link rel="stylesheet" href="/generalStyle.css">
+  <link rel="stylesheet" href="/pages/suggestions/suggestionsStyle.css">
+</head>
+<body>
+    <h1>Submit a Suggestion</h1>
+    <p class="suggestionsDescription">If you have any suggestions for how I can improve this website, please submit them using the form below! I will review all suggestions and implement any that I think are good ideas.</p>
+    <div class="inputContainer">
+        <label id="suggestionInputLabel" class="suggestionInputLabel">Your suggestion:</label>
+        <input id="suggestionInput" type="text" placeholder="Enter your suggestion here..." class="suggestionInput">
+        <input id="nameInput" type="text" placeholder="(Optional) Your name here..." class="nameInput">
+        <button id="submitSuggestionButton" type="button" class="submitSuggestionButton">Submit</button>
+        <div id="responseMessage" class="responseMessage"></div>
+    </div>
+    <script src="/functions/pages/suggestions/suggestionsButton.js"></script>
+</body>
+</html>

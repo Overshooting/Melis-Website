@@ -38,3 +38,12 @@
 .randomQuoteButton:hover {
     background-color: #ad1457;
 }
+
+.suggestionsButton {
+    background-color: #009688;
+    align-self: center;
+}
+
+.suggestionsButton:hover {
+    background-color: #00695c;
+}

@@ -5,7 +5,7 @@ const path = require('path');
 const argon2 = require('argon2');
 
 router.post('/', async (req, res) => {
-    const { username, personName, password }= req.body;
+    const { username, personName, password } = req.body;
     try {
         const rows = await db.getAccountPassword(username);
         if (rows.length === 0) {

@@ -18,6 +18,7 @@
     "scripts": {
         "start": "node express/main/main.js",
         "tunnel": "cloudflared tunnel --url http://localhost:5000",
-        "dev": "npm run start"
+        "dev": "npm run start -- \"Developer Testing\"",
+        "send-dev": "node express/services/sendDevMessage.js"
     }
 }

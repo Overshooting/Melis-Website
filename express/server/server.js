@@ -6,6 +6,7 @@ const ratelimit = require('express-rate-limit');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const logger = require('../services/customLogger');
+require('dotenv').config();
 
 const accountsRouter = require('../routes/website/accounts');
 const homeRouter = require('../routes/website/home');
@@ -16,6 +17,8 @@ const accountsAdminRouter = require('../routes/api/adminBypass');
 const randomNumberGeneratorRouter = require('../routes/website/randomNumberGenerator');
 const randomQuoteRouter = require('../routes/website/randomQuote');
 const adminHelpRouter = require('../routes/website/adminHelp');
+const suggestionsRouter = require('../routes/website/suggestions');
+const submitSuggestionRouter = require('../routes/api/submitSuggestion');
 
 const PORT = process.env.SERVER_PORT || 5000;
 
@@ -53,6 +56,7 @@ server.use('/api/accounts/data', dataRouter);
 server.use('/api/accounts/add-empty', addEmptyAccountRouter);
 server.use('/api/accounts/claim', claimAccountRouter);
 server.use('/api/accounts/admin-bypass', accountsAdminRouter);
+server.use('/api/suggestions/submit', submitSuggestionRouter);
 
 // Website routes
 server.use('/', homeRouter);
@@ -60,5 +64,6 @@ server.use('/random-number-generator', randomNumberGeneratorRouter);
 server.use('/accounts', accountsRouter);
 server.use('/random-quote', randomQuoteRouter);
 server.use('/accounts/admin-help', adminHelpRouter);
+server.use('/suggestions', suggestionsRouter);
 
 module.exports = {server, PORT};

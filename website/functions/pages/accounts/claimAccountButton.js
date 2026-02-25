@@ -14,8 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const name = nameInput.value.trim();
         const password = passwordInput.value.trim();
 
-        accountDisplay.textContent = 'Parameters recieved: ';
-
         if (!username || !name || !password) {
             accountDisplay.textContent = 'Parameters rejected.';
             return;

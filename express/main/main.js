@@ -2,17 +2,25 @@ const { server, PORT } = require('../server/server');
 const { startTunnel, stopTunnel } = require('../services/tunnelSetup');
 const logger = require('../services/customLogger');
 const { initBot, sendStartEmbed, shutdownBot, updateEmbedForStop } = require('../services/discordBot');
+require('dotenv').config();
 
 async function startServer() {
     let domain = `http://localhost:${PORT}`;
     let httpServer = null;
+    const reason = process.argv[2] || "Standard Initialization";
 
     if (process.env.NODE_ENV === 'production') {
-        await initBot();
+        try {
+            await initBot();
+        } catch (err) {
+            logger.info("Failed to initialize Discord bot:", err);
+        }
     }
 
     try {
-        domain = await startTunnel(`http://localhost:${PORT}`);
+        if (process.env.NODE_ENV === 'production') {
+            domain = await startTunnel(`http://localhost:${PORT}`);
+        }
 
         logger.info(`Starting server at ${domain}`);
 
@@ -20,13 +28,13 @@ async function startServer() {
             logger.info(`Server is running at ${domain}`);
             console.log(`Server is running at ${domain}`);
             if (process.env.NODE_ENV === 'production') {
-                await sendStartEmbed(domain);
+                await sendStartEmbed(domain, reason);
             }
         });
 
         let shuttingDown = false;
 
-        const shutdown = async () => {
+        const shutdown = async (shutdownReason) => {
             if (shuttingDown) return;
             shuttingDown = true;
             
@@ -34,7 +42,12 @@ async function startServer() {
             console.log("Shutting down server...");
             
             if (process.env.NODE_ENV === 'production') {
-                await updateEmbedForStop();
+                try {
+                    await updateEmbedForStop(shutdownReason);
+                    logger.info("Embeds updated successfully.");
+                } catch (err) {
+                    logger.info("Failed to update stop embed: ", err);
+                }
             }
             
             await shutdownBot();
@@ -42,7 +55,7 @@ async function startServer() {
 
             if (httpServer) {
                 await new Promise((resolve) => httpServer.close(resolve));
-                logger.info("Server shutdown complete.");
+                logger.info("Server shutdown for reason: " + shutdownReason + " complete.");
             } else {
                 process.exit(0);
             }
@@ -56,24 +69,24 @@ async function startServer() {
         }
 
         process.on('SIGINT', () => {
-            shutdown().finally(() => process.exit(0));
+            shutdown("Standard Shutdown");
         });
         process.on('SIGTERM', async () => {
-            shutdown().finally(() => process.exit(0));
+            shutdown("Standard Shutdown");
         });
         process.on('uncaughtException', async (err) => {
             logger.info("Uncaught Exception: ", err);
             console.error("Uncaught Exception: ", err);
             
             forceExit(1);
-            shutdown().finally(() => process.exit(1));
+            shutdown("Fatal Error (Uncaught Exception)");
         });
         process.on('unhandledRejection', async (err) => {
             logger.info("Unhandled Rejection:", err);
             console.error("Unhandled Rejection:", err);
 
             forceExit(1);
-            shutdown().finally(() => process.exit(1));
+            shutdown("Fatal Error (Unhandled Rejection)");
         });
     } catch (err) {
         logger.info("Failed to start tunnel: ", err);
