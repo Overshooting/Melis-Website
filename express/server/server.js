@@ -23,8 +23,16 @@ const williamWebsiteRouter = require('../routes/website/williamwebsite/frontpage
 
 const PORT = process.env.SERVER_PORT || 5000;
 
+server.set('trust proxy', 1);
+
+morgan.token('real-addr', (req) => {
+    return req.headers['cf-connecting-ip'] || 
+    req.headers['x-forwarded-for'] || 
+    req.socket.remoteAddress;
+});
+
 // Request logging
-server.use(morgan('Incoming :method request from :url at :remote-addr. Status :status sent after :response-time ms',
+server.use(morgan('Incoming :method request from :url at :real-addr. Status :status sent after :response-time ms',
     {
         stream: {
             write: (message) => logger.info(message.trim()),
@@ -42,7 +50,7 @@ const limiter = ratelimit({
     legacyHeaders: false,
 });
 
-server.set('trust proxy', 1);
+
 server.use(express.static(path.join(__dirname, '../../website')));
 server.use(helmet());
 server.use('/api', limiter);
