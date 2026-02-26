@@ -2,6 +2,7 @@ const { server, PORT } = require('../server/server');
 const { startTunnel, stopTunnel } = require('../services/tunnelSetup');
 const logger = require('../services/customLogger');
 const { initBot, sendStartEmbed, shutdownBot, updateEmbedForStop } = require('../services/discordBot');
+const { closePool } = require('../database/db');
 require('dotenv').config();
 
 async function startServer() {
@@ -52,6 +53,7 @@ async function startServer() {
             
             await shutdownBot();
             stopTunnel();
+            await closePool();
 
             if (httpServer) {
                 await new Promise((resolve) => httpServer.close(resolve));

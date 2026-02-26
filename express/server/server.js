@@ -19,6 +19,7 @@ const randomQuoteRouter = require('../routes/website/randomQuote');
 const adminHelpRouter = require('../routes/website/adminHelp');
 const suggestionsRouter = require('../routes/website/suggestions');
 const submitSuggestionRouter = require('../routes/api/submitSuggestion');
+const williamWebsiteRouter = require('../routes/website/williamwebsite/frontpage');
 
 const PORT = process.env.SERVER_PORT || 5000;
 
@@ -65,5 +66,6 @@ server.use('/accounts', accountsRouter);
 server.use('/random-quote', randomQuoteRouter);
 server.use('/accounts/admin-help', adminHelpRouter);
 server.use('/suggestions', suggestionsRouter);
+server.use('/williamwebsite', williamWebsiteRouter);
 
 module.exports = {server, PORT};

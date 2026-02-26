@@ -3,6 +3,7 @@ express/database
 
 # Logs
 logs
+suggestions
 *.log
 npm-debug.log*
 yarn-debug.log*

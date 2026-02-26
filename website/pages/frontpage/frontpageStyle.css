@@ -31,12 +31,12 @@
 }
 
 .randomQuoteButton {
-    background-color: #e91e63;
+    background-color: #e22383;
     align-self: center;
 }
 
 .randomQuoteButton:hover {
-    background-color: #ad1457;
+    background-color: #a31556;
 }
 
 .suggestionsButton {
@@ -46,4 +46,13 @@
 
 .suggestionsButton:hover {
     background-color: #00695c;
+}
+
+.williamWebsiteButton {
+    background-color: #e04e29;
+    align-self: center;
+}
+
+.williamWebsiteButton:hover {
+    background-color: #a32f1b;
 }
