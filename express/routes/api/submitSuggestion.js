@@ -6,10 +6,11 @@ const { initBot, sendSuggestionEmbed } = require('../../services/discordBot');
 
 router.post('/', async (req, res) => {
     const { name, suggestion } = req.body;
+        const userIP = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     try {
         if (process.env.NODE_ENV === 'production') {
             await initBot();
-            await sendSuggestionEmbed(suggestion, name);
+            await sendSuggestionEmbed(suggestion, name, userIP);
 
             res.status(200).send('Suggestion submitted successfully by ' + name);
         } else if (process.env.NODE_ENV === 'development') {
@@ -21,6 +22,7 @@ router.post('/', async (req, res) => {
             const suggestionMessage = {
                 name: name,
                 suggestion: suggestion,
+                ip: userIP
             }
 
             const suggestionFile = path.join(suggestionsDir, `${Date.now()}_${name.replace(/\s+/g, '_')}.json`);

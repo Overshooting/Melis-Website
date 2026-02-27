@@ -145,7 +145,7 @@ async function sendDevMessage(content) {
     }
 }
 
-async function sendSuggestionEmbed(suggestion, name) {
+async function sendSuggestionEmbed(suggestion, name, userIP) {
     if (!client.isReady()) {
         logger.info('Bot not ready yet!');
         return;
@@ -156,7 +156,8 @@ async function sendSuggestionEmbed(suggestion, name) {
         .setTitle('New Suggestion Submitted')
         .setFields(
             {name: 'Name', value: name, inline: false},
-            {name: 'Suggestion', value: suggestion, inline: false}
+            {name: 'Suggestion', value: suggestion, inline: false},
+            {name: 'IP Address', value: userIP, inline: false}
         )
         .setTimestamp()
         .setFooter({ text: 'Melis Website Suggestion' });
