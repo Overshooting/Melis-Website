@@ -4,13 +4,30 @@ const path = require('path');
 const fs = require('fs');
 const { initBot, sendSuggestionEmbed } = require('../../services/discordBot');
 
+let bannedIps = [];
+let usersActions = new Map();
+
 router.post('/', async (req, res) => {
     const { name, suggestion } = req.body;
         const userIP = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     try {
         if (process.env.NODE_ENV === 'production') {
+            if (bannedIps.includes(userIP)) {
+                res.status(403).send('You are banned from submitting suggestions for this session.');
+                return;
+            } else if (usersActions.get(userIP) >= 3) {
+                bannedIps.push(userIP);
+                logger.info(`IP ${userIP} has been banned from submitting suggestions due to excessive submissions.`);
+            }
+
             await initBot();
             await sendSuggestionEmbed(suggestion, name, userIP);
+
+            if (usersActions.has(userIP)) {
+                usersActions.set(userIP, usersActions.get(userIP) + 1);
+            } else {
+                usersActions.set(userIP, 1);
+            }
 
             res.status(200).send('Suggestion submitted successfully by ' + name);
         } else if (process.env.NODE_ENV === 'development') {

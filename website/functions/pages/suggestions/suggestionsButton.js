@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => {
             if (response.ok) {
                 responseMessage.textContent = `Suggestion submitted successfully by ${name}`;
-                window.location.reload();
             } else {
                 responseMessage.textContent = 'Error submitting suggestion.';
             }

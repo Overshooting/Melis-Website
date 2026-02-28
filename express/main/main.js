@@ -63,13 +63,6 @@ async function startServer() {
             }
         };
 
-        const forceExit = (code = 1) => {
-            setTimeout(() => {
-                console.log("Error caused force exit. Exiting...");
-                process.exit(code);
-            }, 5000);
-        }
-
         process.on('SIGINT', () => {
             shutdown("Standard Shutdown");
         });
@@ -78,17 +71,17 @@ async function startServer() {
         });
         process.on('uncaughtException', async (err) => {
             logger.info("Uncaught Exception: ", err);
-            console.error("Uncaught Exception: ", err);
-            
-            forceExit(1);
-            shutdown("Fatal Error (Uncaught Exception)");
+            shutdown("Fatal Error (Uncaught Exception)").finally(() => {
+                console.log("Shutdown complete");
+                process.exit(1);
+            });
         });
         process.on('unhandledRejection', async (err) => {
             logger.info("Unhandled Rejection:", err);
-            console.error("Unhandled Rejection:", err);
-
-            forceExit(1);
-            shutdown("Fatal Error (Unhandled Rejection)");
+            shutdown("Fatal Error (Unhandled Rejection)").finally(() => {
+                console.log("Shutdown complete");
+                process.exit(1);
+            });
         });
     } catch (err) {
         logger.info("Failed to start tunnel: ", err);

@@ -19,6 +19,8 @@
         "start": "node express/main/main.js",
         "tunnel": "cloudflared tunnel --url http://localhost:5000",
         "dev": "npm run start -- \"Developer Testing\"",
-        "send-dev": "node express/services/sendDevMessage.js"
+        "send-dev": "node express/services/sendDevMessage.js",
+        "clean-channels": "node express/services/resetBotChannels.js",
+        "force-bot-shutdown": "node express/services/forceBotShutdown.js"
     }
 }
