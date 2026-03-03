@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', function () {
         suggestionInput.value = '';
         nameInput.value = '';
 
+        responseMessage.textContent = 'Submitting suggestion...';
+
         fetch('/api/suggestions/submit', {
             method: 'POST',
             headers: {

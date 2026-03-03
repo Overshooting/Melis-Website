@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
 
             res.status(200).send('Suggestion submitted successfully by ' + name);
         } else if (process.env.NODE_ENV === 'development') {
-            const suggestionsDir = path.join(__dirname, '../../../suggestions');
+            const suggestionsDir = path.join(__dirname, '../../../submitted_suggestions');
             if (!fs.existsSync(suggestionsDir)) {
                 fs.mkdirSync(suggestionsDir);
             }

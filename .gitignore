@@ -3,7 +3,7 @@ express/database
 
 # Logs
 logs
-suggestions
+submitted_suggestions
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -130,7 +130,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-express/routes/website/williamwebsite
-express/routes/api/williamwebsite
-website/functions/williamwebsite
-website/pages/williamwebsite
+express/routes/website/williamwebsite/
+express/routes/api/williamwebsite/
+website/functions/williamwebsite/
+website/pages/williamwebsite/
