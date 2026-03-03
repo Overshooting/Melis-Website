@@ -141,7 +141,6 @@ async function updateEmbedForStop(reason) {
                     continue;
                 }
                 await message.edit({ embeds: [newEmbed] });
-                logger.info(`Embed updated successfully for guild ${guildId}.`);
             } catch (err) {
                 logger.info(`Failed to update embed for guild ${guildId}:`, err);
                 throw err;
