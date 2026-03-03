@@ -23,6 +23,8 @@ async function sendMessage() {
         process.exit(0);
     } catch (err) {
         logger.info("Failed to send message: ", err);
+    } finally {
+        process.exitCode = 0;
     }
 }
 

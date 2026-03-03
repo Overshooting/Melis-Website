@@ -216,6 +216,10 @@ async function resetAllChannels() {
     for (const guild of client.guilds.cache.values()) {
         try {
             for (const channelName of Object.values(BotChannels)) {
+                if (channelName === process.env.SERVER_DEV_MESSAGES_CHANNEL_NAME) {
+                    continue;
+                }
+
                 try {
                     const channel = await ensureAndFetchChannel(guild.id, channelName);
                     await channel.delete();
