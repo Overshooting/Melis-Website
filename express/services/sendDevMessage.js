@@ -1,4 +1,4 @@
-const logger = require('./customLogger');
+const { logger } = require('./customLogger');
 const {initBot, sendDevMessage} = require('./discordBot');
 require ('dotenv').config();
 

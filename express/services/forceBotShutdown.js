@@ -1,5 +1,5 @@
 const {shutdownBot} = require('./discordBot');
-const logger = require('./customLogger');
+const { logger } = require('./customLogger');
 require('dotenv').config();
 
 async function forceBotShutdown() {

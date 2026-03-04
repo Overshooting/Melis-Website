@@ -1,11 +1,9 @@
-const logger = require('./customLogger');
+const { logger } = require('./customLogger');
 const { spawn } = require('child_process');
 
 let tunnelProcess = null;
 
 function startTunnel(localUrl) {
-    logger.info("Initializing cloudflared tunnel");
-
     return new Promise((resolve, reject) => {
         tunnelProcess = spawn('cloudflared', [
             'tunnel',

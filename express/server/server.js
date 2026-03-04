@@ -5,7 +5,7 @@ const cors = require('cors');
 const ratelimit = require('express-rate-limit');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const logger = require('../services/customLogger');
+const { logger } = require('../services/customLogger');
 require('dotenv').config();
 
 const accountsRouter = require('../routes/website/accounts');

@@ -26,7 +26,7 @@ if (!fs.existsSync(logDir)) {
 }
 
 const logStream = fs.createWriteStream(
-  path.join(logDir, `${logType}-${dateAndTime}.log`),
+    path.join(logDir, `${logType}-${dateAndTime}.log`),
   { flags: 'a' }
 );
 
@@ -73,4 +73,4 @@ const logger = pino({
     },
 msgOnlyFilter);
 
-module.exports = logger;
+module.exports = { logger };

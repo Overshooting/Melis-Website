@@ -1,6 +1,6 @@
 const { server, PORT } = require('../server/server');
 const { startTunnel, stopTunnel } = require('../services/tunnelSetup');
-const logger = require('../services/customLogger');
+const { logger } = require('../services/customLogger');
 const { initBot, sendStartEmbed, shutdownBot, updateEmbedForStop } = require('../services/discordBot');
 const { closePool } = require('../database/db');
 require('dotenv').config();
@@ -22,8 +22,6 @@ async function startServer() {
         if (process.env.NODE_ENV === 'production') {
             domain = await startTunnel(`http://localhost:${PORT}`);
         }
-
-        logger.info(`Starting server at ${domain}`);
 
         httpServer = server.listen(PORT, '0.0.0.0', async () => {
             logger.info(`Server is running at ${domain}`);

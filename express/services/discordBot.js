@@ -5,7 +5,7 @@ const {
     PermissionsBitField,
     EmbedBuilder,
 } = require('discord.js');
-const logger = require('../services/customLogger');
+const { logger } = require('../services/customLogger');
 const { send } = require('node:process');
 require('dotenv').config();
 

@@ -1,4 +1,5 @@
 const {initBot, resetAllChannels, resetChannel, shutdownBot} = require('./discordBot');
+const { logger } = require('./customLogger');
 require('dotenv').config();
 
 async function resetBotChannels() {
