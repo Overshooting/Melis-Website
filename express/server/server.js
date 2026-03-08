@@ -20,6 +20,9 @@ const adminHelpRouter = require('../routes/website/adminHelp');
 const suggestionsRouter = require('../routes/website/suggestions');
 const submitSuggestionRouter = require('../routes/api/submitSuggestion');
 const williamWebsiteRouter = require('../routes/website/williamwebsite/frontpage');
+const submissionsRouter = require('../routes/website/modSubmissions');
+const submitArtRouter = require('../routes/website/submitArt');
+const uploadArtRouter = require('../routes/api/submitArt');
 
 const PORT = process.env.SERVER_PORT || 5000;
 
@@ -66,6 +69,7 @@ server.use('/api/accounts/add-empty', addEmptyAccountRouter);
 server.use('/api/accounts/claim', claimAccountRouter);
 server.use('/api/accounts/admin-bypass', accountsAdminRouter);
 server.use('/api/suggestions/submit', submitSuggestionRouter);
+server.use('/api/submitArt/upload', submitArtRouter);
 
 // Website routes
 server.use('/', homeRouter);
@@ -75,5 +79,6 @@ server.use('/random-quote', randomQuoteRouter);
 server.use('/accounts/admin-help', adminHelpRouter);
 server.use('/suggestions', suggestionsRouter);
 server.use('/williamwebsite', williamWebsiteRouter);
-
+server.use('/mod-submissions', submissionsRouter);
+server.use('/mod-submissions/submit-art', submitArtRouter);
 module.exports = {server, PORT};

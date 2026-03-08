@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Art - Melis Website</title>
+    <link rel="stylesheet" href="/generalStyle.css">
+    <link rel="stylesheet" href="/pages/modSubmissions/submitArt/submitArtStyle.css">
+</head>
+<body>
+    <button class="homeBtn" id="homeBtn">Home</button>
+    <button class="backBtn" id="backBtn">Back</button>
+    <div id="formContainer" class="formContainer">
+    <h1>Submit Concept Art</h1>
+    <form id="artForm" class="artForm">
+        <input type="file"
+            id="imageInput"
+            name="image"
+            accept="image/png,image/jpeg,image/webp"
+            class="fileInput"
+            required>
+        <input type="text"
+            id="artistName"
+            name="artistName"
+            placeholder="Name"
+            class="textInput"
+            required>
+        <input type="text"
+            id="artTitle"
+            name="artTitle"
+            placeholder="Title"
+            class="textInput"
+            required>
+        <button type="submit" class="submitButton" id="submitButton">Submit</button>
+        <p class="message" id="message"></p>
+    </form>
+    </div>
+    <script src="/functions/homeButton.js"></script>
+    <script src="/functions/pages/modSubmissions/submitArt/backButton.js"></script>
+    <script src="/functions/pages/modSubmissions/submitArt/submitButton.js"></script>
+</body>
+</html>

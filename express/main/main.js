@@ -14,7 +14,7 @@ async function startServer() {
         try {
             await initBot();
         } catch (err) {
-            logger.info("Failed to initialize Discord bot:", err);
+            logger.info(err + "Failed to initialize Discord bot:");
         }
     }
 
@@ -45,7 +45,7 @@ async function startServer() {
                     await updateEmbedForStop(shutdownReason);
                     logger.info("Embeds updated successfully.");
                 } catch (err) {
-                    logger.info("Failed to update stop embed: ", err);
+                    logger.info(err + "Failed to update stop embed: ");
                 }
             }
             
@@ -68,21 +68,21 @@ async function startServer() {
             shutdown("Standard Shutdown");
         });
         process.on('uncaughtException', async (err) => {
-            logger.info("Uncaught Exception: ", err);
+            logger.info("Uncaught Exception: " + err);
             shutdown("Fatal Error (Uncaught Exception)").finally(() => {
                 console.log("Shutdown complete");
                 process.exit(1);
             });
         });
         process.on('unhandledRejection', async (err) => {
-            logger.info("Unhandled Rejection:", err);
+            logger.info("Unhandled Rejection: " + err);
             shutdown("Fatal Error (Unhandled Rejection)").finally(() => {
                 console.log("Shutdown complete");
                 process.exit(1);
             });
         });
     } catch (err) {
-        logger.info("Failed to start tunnel: ", err);
+        logger.info("Failed to start tunnel: " + err);
         console.error("Failed to start tunnel: ", err);
         stopTunnel();
         process.exit(1);

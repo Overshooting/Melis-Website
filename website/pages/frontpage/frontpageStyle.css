@@ -56,3 +56,12 @@
 .williamWebsiteButton:hover {
     background-color: #a32f1b;
 }
+
+.modSubmissionsButton {
+    background-color: #0ead00;
+    align-self: center;
+}
+
+.modSubmissionsButton:hover {
+    background-color: #0a7a00;
+}

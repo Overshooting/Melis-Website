@@ -1,0 +1,55 @@
+.backBtn {
+    background-color: #008cba;
+    align-self: center;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.backBtn:hover {
+    background-color: #005f5f;
+}
+
+.artForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    align-self: center;
+}
+
+.submitButton {
+    background-color: #28a745;
+    align-self: center;
+    padding: 10px 20px;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+}
+
+.fileInput {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    align-self: center;
+}
+
+.textInput {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    align-self: center;
+}
