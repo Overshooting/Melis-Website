@@ -20,6 +20,7 @@
             accept="image/png,image/jpeg,image/webp"
             class="fileInput"
             required>
+        <img id="imagePreview" class="imagePreview" src="#" style="display: none;">
         <input type="text"
             id="artistName"
             name="artistName"
@@ -33,11 +34,11 @@
             class="textInput"
             required>
         <button type="submit" class="submitButton" id="submitButton">Submit</button>
-        <p class="message" id="message"></p>
     </form>
     </div>
+    <p class="message" id="message"></p>
     <script src="/functions/homeButton.js"></script>
     <script src="/functions/pages/modSubmissions/submitArt/backButton.js"></script>
-    <script src="/functions/pages/modSubmissions/submitArt/submitButton.js"></script>
+    <script src="/functions/pages/modSubmissions/submitArt/submitForm.js"></script>
 </body>
 </html>

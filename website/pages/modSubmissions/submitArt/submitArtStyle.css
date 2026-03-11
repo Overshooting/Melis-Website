@@ -9,6 +9,10 @@
     background-color: #005f5f;
 }
 
+.message {
+    align-content: center;
+}
+
 .artForm {
     display: flex;
     flex-direction: column;
