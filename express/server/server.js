@@ -59,10 +59,22 @@ server.use(express.static(path.join(__dirname, '../../website')));
 server.use('/mod-submissions/submitted-art', express.static(path.join(__dirname, '../../art_submissions')));
 server.use(helmet());
 server.use('/api', limiter);
-server.use(cors(({
-    origin: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-})));
+
+async function initalizeCors(domain) {
+    const corsOptions = {
+        origin: (origin, callback) => {
+            if (!origin || origin === domain) {
+                callback(null, true);
+            } else {
+                callback(new Error('Unauthorized domain!'));
+            }
+        },
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    };
+    
+    server.use(cors(corsOptions));
+}
+
 server.use(express.json());
 
 // API routes
