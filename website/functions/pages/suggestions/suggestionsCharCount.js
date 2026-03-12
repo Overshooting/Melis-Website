@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const suggestionCharacterCount = document.getElementById('suggestionCharacterCount');
     const nameCharacterCount = document.getElementById('nameCharacterCount');
 
-    checkCharCount(suggestionInput, suggestionCharacterCount, 100);
+    checkCharCount(suggestionInput, suggestionCharacterCount, 200);
     checkCharCount(nameInput, nameCharacterCount, 50);
 
     suggestionInput.addEventListener('input', function () {
-        checkCharCount(suggestionInput, suggestionCharacterCount, 100);
+        checkCharCount(suggestionInput, suggestionCharacterCount, 200);
     });
 
     nameInput.addEventListener('input', function () {
