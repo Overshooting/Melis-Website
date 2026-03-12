@@ -9,7 +9,7 @@ let usersActions = new Map();
 
 router.post('/', async (req, res) => {
     const { name, suggestion } = req.body;
-        const userIP = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const userIP = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     try {
         if (process.env.NODE_ENV === 'production') {
             if (bannedIps.includes(userIP)) {

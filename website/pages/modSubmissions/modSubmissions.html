@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moderator Submissions - Melis Website</title>
+    <title>Mod Art Submissions - Melis Website</title>
     <link rel="stylesheet" href="/generalStyle.css">
     <link rel="stylesheet" href="/pages/modSubmissions/modSubmissionsStyle.css">
 </head>
@@ -16,7 +16,14 @@
             for concept art, if you have direct assets to submit please message them to me directly.</h2>
         <button class="openSubmitButton" id="openSubmitButton">Submit your concept art</button>
     </div>
-    <div class="submissions" id="submissions"></div>
+    <div class="submissionsContainer" id="submissionsContainer">
+        <div class="submissions" id="submissions"></div>
+        <div class="pagination" id="pagination">
+            <button id="prevPage">Previous</button>
+            <span id="currentPage"></span>
+            <button id="nextPage">Next</button>
+        </div>
+    </div>
     <script src="/functions/homeButton.js"></script>
     <script src="/functions/pages/modSubmissions/openSubmitButton.js"></script>
     <script src="/functions/pages/modSubmissions/fetchSubmissions.js"></script>

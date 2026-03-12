@@ -23,6 +23,7 @@ const williamWebsiteRouter = require('../routes/website/williamwebsite/frontpage
 const submissionsRouter = require('../routes/website/modSubmissions');
 const submitArtRouter = require('../routes/website/submitArt');
 const uploadArtRouter = require('../routes/api/submitArt');
+const fetchSubmissionsRouter = require('../routes/api/fetchSubmissions');
 
 const PORT = process.env.SERVER_PORT || 5000;
 
@@ -71,6 +72,7 @@ server.use('/api/accounts/claim', claimAccountRouter);
 server.use('/api/accounts/admin-bypass', accountsAdminRouter);
 server.use('/api/suggestions/submit', submitSuggestionRouter);
 server.use('/api/submit-art/upload', uploadArtRouter);
+server.use('/api/mod-submissions/fetch-submissions', fetchSubmissionsRouter);
 
 // Website routes
 server.use('/', homeRouter);
