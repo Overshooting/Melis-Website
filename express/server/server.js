@@ -96,4 +96,4 @@ server.use('/suggestions', suggestionsRouter);
 server.use('/williamwebsite', williamWebsiteRouter);
 server.use('/mod-submissions', submissionsRouter);
 server.use('/mod-submissions/submit-art', submitArtRouter);
-module.exports = {server, PORT};
+module.exports = {server, PORT, initializeCors};
