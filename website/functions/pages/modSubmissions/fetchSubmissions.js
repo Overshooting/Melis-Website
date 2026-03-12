@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             updateButtons()
         } catch (error) {
-            container.innerHTML = '<p>An error occurred while fetching submissions: ' + error + '</p>';
+            container.innerHTML = '<p>An error occurred while fetching submissions.</p>';
             currentPageSpan.textContent = '1/1';
             updateButtons();
         }
