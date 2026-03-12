@@ -55,6 +55,7 @@ const limiter = ratelimit({
 
 
 server.use(express.static(path.join(__dirname, '../../website')));
+server.use('/mod-submissions/submitted-art', express.static(path.join(__dirname, '../../art_submissions')));
 server.use(helmet());
 server.use('/api', limiter);
 server.use(cors(({
@@ -69,7 +70,7 @@ server.use('/api/accounts/add-empty', addEmptyAccountRouter);
 server.use('/api/accounts/claim', claimAccountRouter);
 server.use('/api/accounts/admin-bypass', accountsAdminRouter);
 server.use('/api/suggestions/submit', submitSuggestionRouter);
-server.use('/api/submitArt/upload', submitArtRouter);
+server.use('/api/submit-art/upload', uploadArtRouter);
 
 // Website routes
 server.use('/', homeRouter);

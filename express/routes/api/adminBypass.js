@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../../database/db');
+const db = require('../../database/valorantDB');
 const argon2 = require('argon2');
 
 router.delete('/', async (req, res) => {

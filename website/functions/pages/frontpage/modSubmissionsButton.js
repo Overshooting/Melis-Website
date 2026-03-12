@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-	var btn = document.getElementById('modSubmissionsButton');
+	const btn = document.getElementById('modSubmissionsButton');
 	if (!btn) return;
 	btn.addEventListener('click', function (e) {
 		e.preventDefault();

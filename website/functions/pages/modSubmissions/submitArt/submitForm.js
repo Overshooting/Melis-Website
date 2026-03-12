@@ -1,109 +1,114 @@
-const form = document.getElementById("artForm");
-const fileInput = document.getElementById("imageInput");
-const artistNameInput = document.getElementById("artistName");
-const artTitleInput = document.getElementById("artTitle");
-const statusMessage = document.getElementById("message");
-const imagePreview = document.getElementById("imagePreview");
-const submitButton = document.getElementById("submitButton");
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("artForm");
+    const fileInput = document.getElementById("imageInput");
+    const artistNameInput = document.getElementById("artistName");
+    const artTitleInput = document.getElementById("artTitle");
+    const statusMessage = document.getElementById("message");
+    const imagePreview = document.getElementById("imagePreview");
+    const submitButton = document.getElementById("submitButton");
 
-form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+    form.reset();
 
-    submitButton.disabled = true;
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-    const file = fileInput.files[0];
-    const artistName = artistNameInput.value.trim();
-    const artTitle = artTitleInput.value.trim();
+        submitButton.disabled = true;
 
-    const validationError = validateSubmission(file, artistName, artTitle);
+        const file = fileInput.files[0];
+        const artistName = artistNameInput.value.trim();
+        const artTitle = artTitleInput.value.trim();
 
-    if (validationError) {
-        statusMessage.textContent = validationError;
-        return;
-    }
+        const validationError = validateSubmission(file, artistName, artTitle);
 
-
-
-    const formData = new FormData();
-    formData.append("image", file);
-    formData.append("artistName", artistName);
-    formData.append("artTitle", artTitle);
-
-    try {
-        const response = await fetch("/api/submitArt/upload", {
-            method: "POST",
-            body: formData
-        });
-
-        const result = await response.json();
-
-        statusMessage.textContent = "Uploading submission...";
-
-        if (!response.ok) {
-            throw new Error(result.message || "Upload failed");
+        if (validationError) {
+            statusMessage.textContent = validationError;
+            submitButton.disabled = false;
+            return;
         }
 
-        statusMessage.textContent = "Upload successful! Pending review.";
-        form.reset();
-        submitButton.disabled = false;
-    } catch (err) {
-        statusMessage.textContent = err.message;
-        submitButton.disabled = false;
-    }
-});
 
-fileInput.addEventListener("change", () => {
-    const file = fileInput.files[0];
 
-    if (!file) return;
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("artistName", artistName);
+        formData.append("artTitle", artTitle);
 
-    const reader = new FileReader();
+        try {
+            const response = await fetch("/api/submit-art/upload", {
+                method: "POST",
+                body: formData
+            });
 
-    reader.addEventListener("load", () => {
-        imagePreview.src = reader.result;
-        imagePreview.style.display = "block";
+            const result = await response.json();
+
+            statusMessage.textContent = "Uploading submission...";
+
+            if (!response.ok) {
+                throw new Error(result.message);
+            }
+
+            statusMessage.textContent = "Upload successful! Thank you for your submission.";
+            form.reset();
+            submitButton.disabled = false;
+        } catch (err) {
+            statusMessage.textContent = "Error: " + err.message;
+            submitButton.disabled = false;
+        }
     });
 
-    reader.readAsDataURL(file);
+    fileInput.addEventListener("change", () => {
+        const file = fileInput.files[0];
+
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.addEventListener("load", () => {
+            imagePreview.src = reader.result;
+            imagePreview.style.display = "block";
+        });
+
+        reader.readAsDataURL(file);
+    });
+
+    function validateSubmission(file, artistName, artTitle) {
+
+        if (!file) {
+            return "Please select an image.";
+        }
+
+        const allowedTypes = [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            return "Invalid file type. Only PNG, JPG, and WEBP allowed.";
+        }
+
+        const maxSize = 5 * 1024 * 1024;
+
+        if (file.size > maxSize) {
+            return "Image must be smaller than 5MB.";
+        }
+
+        if (artTitle.length < 3) {
+            return "Title must be at least 3 characters.";
+        }
+
+        if (artTitle.length > 50) {
+            return "Title too long.";
+        }
+
+        if (!artistName) {
+            artistName = "Anonymous";
+        }
+
+        if (artistName.length > 30) {
+            return "Artist name too long.";
+        }
+
+        return null;
+    }
 });
-
-function validateSubmission(file, artistName, artTitle) {
-
-    if (!file) {
-        return "Please select an image.";
-    }
-
-    const allowedTypes = [
-        "image/png",
-        "image/jpeg",
-        "image/webp"
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-        return "Invalid file type. Only PNG, JPG, and WEBP allowed.";
-    }
-
-    const maxSize = 5 * 1024 * 1024;
-
-    if (file.size > maxSize) {
-        return "Image must be smaller than 5MB.";
-    }
-
-    if (artTitle.length < 3) {
-        return "Title must be at least 3 characters.";
-    }
-
-    if (artTitle.length > 50) {
-        return "Title too long.";
-    }
-
-    if (!artistName) {
-        artistName = "Anonymous";
-    }
-
-    if (artistName.length > 30) {
-        return "Artist name too long.";
-    }
-
-    return null;
-}

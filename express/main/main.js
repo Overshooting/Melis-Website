@@ -2,7 +2,9 @@ const { server, PORT } = require('../server/server');
 const { startTunnel, stopTunnel } = require('../services/tunnelSetup');
 const { logger } = require('../services/customLogger');
 const { initBot, sendStartEmbed, shutdownBot, updateEmbedForStop } = require('../services/discordBot');
-const { closePool } = require('../database/db');
+const { closeValorantPool } = require('../database/valorantDB');
+const { closeWebsitePool } = require('../database/melisWebsite');
+
 require('dotenv').config();
 
 async function startServer() {
@@ -51,7 +53,8 @@ async function startServer() {
             
             await shutdownBot();
             stopTunnel();
-            await closePool();
+            await closeValorantPool();
+            await closeWebsitePool();
 
             if (httpServer) {
                 await new Promise((resolve) => httpServer.close(resolve));
