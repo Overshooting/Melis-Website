@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
             form.reset();
             submitButton.disabled = false;
         } catch (err) {
-            statusMessage.textContent = "Error: " + err.message;
+            statusMessage.textContent = "An error occurred when submitting. Please try again later.";
             submitButton.disabled = false;
         }
     });
