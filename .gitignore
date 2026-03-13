@@ -1,6 +1,9 @@
 # Extra Safety
 express/database
 
+# Image storage
+art_submissions/
+
 # Logs
 logs
 submitted_suggestions
