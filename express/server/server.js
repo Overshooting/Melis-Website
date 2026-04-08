@@ -60,7 +60,7 @@ server.use('/mod-submissions/submitted-art', express.static(path.join(__dirname,
 server.use(helmet());
 server.use('/api', limiter);
 
-async function initalizeCors(domain) {
+async function initializeCors(domain) {
     const corsOptions = {
         origin: (origin, callback) => {
             if (!origin || origin === domain) {

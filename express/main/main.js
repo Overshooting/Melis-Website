@@ -1,4 +1,4 @@
-const { server, PORT, initalizeCors } = require('../server/server');
+const { server, PORT, initializeCors } = require('../server/server');
 const { startTunnel, stopTunnel } = require('../services/tunnelSetup');
 const { logger } = require('../services/customLogger');
 const { initBot, sendStartEmbed, shutdownBot, updateEmbedForStop } = require('../services/discordBot');
@@ -25,7 +25,7 @@ async function startServer() {
             domain = await startTunnel(`http://localhost:${PORT}`);
         }
 
-        await initalizeCors(domain);
+        await initializeCors(domain);
 
         httpServer = server.listen(PORT, '0.0.0.0', async () => {
             logger.info(`Server is running at ${domain}`);

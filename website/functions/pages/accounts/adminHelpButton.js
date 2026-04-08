@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-	var btn = document.getElementById('helpBtn');
+	const btn = document.getElementById('helpBtn');
 	if (!btn) return;
 	btn.addEventListener('click', function (e) {
 		e.preventDefault();
