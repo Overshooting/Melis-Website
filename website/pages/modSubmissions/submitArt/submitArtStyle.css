@@ -1,14 +1,3 @@
-.backBtn {
-    background-color: #008cba;
-    align-self: center;
-    margin-top: 5px;
-    margin-left: 5px;
-}
-
-.backBtn:hover {
-    background-color: #005f5f;
-}
-
 .message {
     align-content: center;
 }

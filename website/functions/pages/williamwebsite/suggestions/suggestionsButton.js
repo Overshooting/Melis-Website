@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const responseMessage = document.getElementById('responseMessage');
     const suggestionInput = document.getElementById('suggestionInput');
     const nameInput = document.getElementById('nameInput');
+    const suggestionCharacterCount = document.getElementById('suggestionCharacterCount');
+    const nameCharacterCount = document.getElementById('nameCharacterCount');
 
 
 	if (!btn) return;
@@ -20,10 +22,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         suggestionInput.value = '';
         nameInput.value = '';
+        suggestionCharacterCount.textContent = '0';
+        nameCharacterCount.textContent = '0';
 
         responseMessage.textContent = 'Submitting suggestion...';
 
-        fetch('/api/suggestions/submit', {
+        fetch('/williamwebsite/api/suggestions/submit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

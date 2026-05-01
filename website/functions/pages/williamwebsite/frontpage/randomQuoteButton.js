@@ -3,6 +3,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (!btn) return;
 	btn.addEventListener('click', function (e) {
 		e.preventDefault();
-		window.location.href = '/random-quote';
+		window.location.href = '/williamwebsite/random-quote';
 	});
 });

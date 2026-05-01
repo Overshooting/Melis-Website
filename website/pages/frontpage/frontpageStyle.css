@@ -30,24 +30,6 @@
     background-color: #2c387e;
 }
 
-.randomQuoteButton {
-    background-color: #e22383;
-    align-self: center;
-}
-
-.randomQuoteButton:hover {
-    background-color: #a31556;
-}
-
-.suggestionsButton {
-    background-color: #009688;
-    align-self: center;
-}
-
-.suggestionsButton:hover {
-    background-color: #00695c;
-}
-
 .williamWebsiteButton {
     background-color: #e04e29;
     align-self: center;
