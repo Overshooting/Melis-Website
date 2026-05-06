@@ -131,4 +131,13 @@ server.use('/mod-submissions', submissionsRouter);
 server.use('/mod-submissions/submit-art', submitArtRouter);
 server.use('/remote-login', remoteLoginRouter);
 
+server.use(function (err, req, res, next) {
+    if (err.code === 'EBADCSRFTOKEN') {
+        res.status(403).json({
+            error: 'Invalid CSRF Token',
+            message: 'Please refresh the page and try again.'
+        });
+    }
+});
+
 module.exports = {server, PORT, initializeCors};

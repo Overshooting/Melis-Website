@@ -1,19 +1,10 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
 	const btn = document.getElementById('deleteAccountBtn');
     const accountDisplay = document.getElementById('outputDisplay');
     const usernameInput = document.getElementById('deleteUsernameInput');
     const passwordInput = document.getElementById('deletePasswordInput');
-
-    async function fetchCSRFToken() {
-        try {
-            const response = await fetch('/api/csrf-token');
-            const data = await response.json();
-            return data.csrfToken;
-        } catch (error) {
-            console.error('Error fetching CSRF token:', error);
-            return null;
-        }
-    }
+    const csrfRes = await fetch('/api/csrf-token');
+    const { csrfToken } = await csrfRes.json();
 
 	if (!btn) return;
 	
@@ -28,28 +19,22 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const csrfToken = await fetchCSRFToken();
-        if (!csrfToken) {
-            accountDisplay.textContent = 'Error: Failed to fetch CSRF token.';
-            return;
-        }
-
         usernameInput.value = '';
         passwordInput.value = '';
         
         fetch('/api/accounts/data', {
             method: 'DELETE',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
+                'x-csrf-token': csrfToken
             },
             body: JSON.stringify({
                 username: username,
                 password: password,
-                csrfToken: csrfToken,
             }),
         }).then(response => {
             if (response.ok) {
-                accountDisplay.textContent = `Account with username "${username}" deleted successfully. Please refresh your page.`;
                 window.location.reload();
             } else {
                 accountDisplay.textContent = 'Error deleting account.';

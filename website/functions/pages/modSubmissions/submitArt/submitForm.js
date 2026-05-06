@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const form = document.getElementById("artForm");
     const fileInput = document.getElementById("imageInput");
     const artistNameInput = document.getElementById("artistName");
@@ -6,17 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const statusMessage = document.getElementById("message");
     const imagePreview = document.getElementById("imagePreview");
     const submitButton = document.getElementById("submitButton");
-
-    async function fetchCSRFToken() {
-        try {
-            const response = await fetch('/api/csrf-token');
-            const data = await response.json();
-            return data.csrfToken;
-        } catch (error) {
-            console.error('Error fetching CSRF token:', error);
-            return null;
-        }
-    }
+    const csrfRes = await fetch('/api/csrf-token');
+    const { csrfToken } = await csrfRes.json();
 
     form.reset();
 
@@ -44,17 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append("artistName", artistName);
         formData.append("artTitle", artTitle);
 
-        const csrfToken = await fetchCSRFToken();
-        if (!csrfToken) {
-            statusMessage.textContent = "Error: Failed to fetch CSRF token.";
-            submitButton.disabled = false;
-            return;
-        }
-        formData.append("csrfToken", csrfToken);
-
         try {
             const response = await fetch("/api/submit-art/upload", {
                 method: "POST",
+                credentials: 'include',
+                headers: {
+                    'x-csrf-token': csrfToken
+                },
                 body: formData
             });
 

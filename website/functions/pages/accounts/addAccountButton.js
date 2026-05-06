@@ -1,19 +1,10 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
 	const btn = document.getElementById('addAccountBtn');
     const accountDisplay = document.getElementById('outputDisplay');
     const usernameInput = document.getElementById('addUsernameInput');
     const passwordInput = document.getElementById('addPasswordInput');
-
-    async function fetchCSRFToken() {
-        try {
-            const response = await fetch('/api/csrf-token');
-            const data = await response.json();
-            return data.csrfToken;
-        } catch (error) {
-            console.error('Error fetching CSRF token:', error);
-            return null;
-        }
-    }
+    const csrfRes = await fetch('/api/csrf-token');
+    const { csrfToken } = await csrfRes.json();
 
 	if (!btn) return;
 	btn.addEventListener('click', async function (e) {
@@ -27,28 +18,22 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const csrfToken = await fetchCSRFToken();
-        if (!csrfToken) {
-            accountDisplay.textContent = 'Error: Failed to fetch CSRF token.';
-            return;
-        }
-
         usernameInput.value = '';
         passwordInput.value = '';
         
         fetch('/api/accounts/add-empty', {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
+                'x-csrf-token': csrfToken
             },
             body: JSON.stringify({
                 username: username,
                 password: password,
-                csrfToken: csrfToken,
             }),
         }).then(response => {
             if (response.ok) {
-                accountDisplay.textContent = `Account with username "${username}" added successfully. Please refresh your page.`;
                 window.location.reload();
             } else {
                 accountDisplay.textContent = 'Error adding account.';

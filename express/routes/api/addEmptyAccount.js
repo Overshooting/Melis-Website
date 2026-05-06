@@ -5,14 +5,14 @@ const db = require('../../database/valorantDB');
 const argon2 = require('argon2');
 
 const MIN_USERNAME_LENGTH = 3;
-const MAX_USERNAME_LENGTH = 50;
-const MIN_PASSWORD_LENGTH = 8;
-const MAX_PASSWORD_LENGTH = 128;
+const MAX_USERNAME_LENGTH = 20;
+const MIN_PASSWORD_LENGTH = 4;
+const MAX_PASSWORD_LENGTH = 20;
 
 function validateUsername(username) {
     if (typeof username !== 'string') return false;
     if (username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH) return false;
-    return /^[a-zA-Z0-9_.-]+$/.test(username);
+    return true;
 }
 
 function validatePassword(password) {

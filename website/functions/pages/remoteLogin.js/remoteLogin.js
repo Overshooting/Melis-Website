@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 			fetch('/api/remote-login/disconnect', {
 				method: 'POST',
+				credentials: 'include',
 				headers: { 
                     'Content-Type': 'application/json',
                     'x-csrf-token': csrfToken
@@ -86,7 +87,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 					await fetch('/api/remote-login/disconnect', {
 						method: 'POST',
                         credentials: 'include',
-						headers: { 'Content-Type': 'application/json' },
+						headers: { 
+							'Content-Type': 'application/json',
+							'x-csrf-token': csrfToken
+						 },
 						body: JSON.stringify({ sessionKey: activeSessionKey }),
 					});
 				} catch (error) {

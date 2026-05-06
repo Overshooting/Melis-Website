@@ -1,21 +1,12 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
 	const btn = document.getElementById('submitSuggestionButton');
     const responseMessage = document.getElementById('responseMessage');
     const suggestionInput = document.getElementById('suggestionInput');
     const nameInput = document.getElementById('nameInput');
     const suggestionCharacterCount = document.getElementById('suggestionCharacterCount');
     const nameCharacterCount = document.getElementById('nameCharacterCount');
-
-    async function fetchCSRFToken() {
-        try {
-            const response = await fetch('/api/csrf-token');
-            const data = await response.json();
-            return data.csrfToken;
-        } catch (error) {
-            console.error('Error fetching CSRF token:', error);
-            return null;
-        }
-    }
+    const csrfRes = await fetch('/api/csrf-token');
+    const { csrfToken } = await csrfRes.json();
 
 	if (!btn) return;
 	
@@ -30,12 +21,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const csrfToken = await fetchCSRFToken();
-        if (!csrfToken) {
-            responseMessage.textContent = 'Error: Failed to fetch CSRF token.';
-            return;
-        }
-
         suggestionInput.value = '';
         nameInput.value = '';
         suggestionCharacterCount.textContent = '0';
@@ -45,10 +30,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         fetch('/williamwebsite/api/suggestions/submit', {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
+                'x-csrf-token': csrfToken
             },
-            body: JSON.stringify({ suggestion: suggestion, name: name, csrfToken: csrfToken }),
+            body: JSON.stringify({ suggestion: suggestion, name: name, }),
         })
         .then(response => {
             if (response.ok) {
