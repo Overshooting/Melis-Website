@@ -384,10 +384,66 @@ function initRemoteSession(httpServer) {
     });
 }
 
+async function shutdownRemoteSession() {
+    if (sessionState.streamInterval) {
+        clearInterval(sessionState.streamInterval);
+        sessionState.streamInterval = null;
+    }
+
+    if (sessionState.ws && sessionState.ws.readyState === WebSocket.OPEN) {
+        try {
+            sessionState.ws.close(1001, 'Server shutdown');
+        } catch (error) {
+            // Best-effort close; continue shutdown.
+        }
+    }
+
+    if (!wssInstance) {
+        clearSession();
+        return;
+    }
+
+    const clients = Array.from(wssInstance.clients || []);
+    for (const client of clients) {
+        if (client.readyState === WebSocket.OPEN) {
+            try {
+                client.close(1001, 'Server shutdown');
+            } catch (error) {
+                // Ignore close errors on shutdown.
+            }
+        }
+    }
+
+    await Promise.race([
+        new Promise((resolve) => {
+            wssInstance.close(() => {
+                wssInstance = null;
+                resolve();
+            });
+        }),
+        new Promise((resolve) => {
+            setTimeout(() => {
+                for (const client of clients) {
+                    try {
+                        client.terminate();
+                    } catch (error) {
+                        // Ignore terminate errors on shutdown.
+                    }
+                }
+                wssInstance = null;
+                resolve();
+            }, 2000);
+        }),
+    ]);
+
+    clearSession();
+}
+
 loadPersistedSessionState();
 
 module.exports = {
     initRemoteSession,
+    shutdownRemoteSession,
     reserveSession,
     isSessionActive,
     disconnectSession,

@@ -1,5 +1,5 @@
 const { server, PORT, initializeCors } = require('../server/server');
-const { initRemoteSession } = require('../services/remoteSession');
+const { initRemoteSession, shutdownRemoteSession } = require('../services/remoteSession');
 const { startTunnel, stopTunnel } = require('../services/tunnelSetup');
 const { logger } = require('../services/customLogger');
 const { initBot, sendStartEmbed, shutdownBot, updateEmbedForStop } = require('../services/discordBot');
@@ -44,30 +44,30 @@ async function startServer() {
             if (shuttingDown) return;
 
             shuttingDown = true;
+            const forceExitTimer = setTimeout(() => {
+                logger.info("Force exiting after shutdown timeout.");
+                process.exit(1);
+            }, 10000);
             
             logger.info("Shutting down server...");
             console.log("Shutting down server...");
-            
-            try {
-                await updateEmbedForStop(shutdownReason);
-                logger.info("Embeds updated successfully.");
-            } catch (err) {
-                logger.info(err + "Failed to update stop embed: ");
-            }
-            
+
+            await updateEmbedForStop(shutdownReason);
+
+            await shutdownRemoteSession();
             await shutdownBot();
-            await stopTunnel();
             await closeValorantPool();
             await closeWebsitePool();
+            await stopTunnel();
 
             if (httpServer) {
                 await new Promise((resolve) => httpServer.close(resolve)).finally(() => {
-                    logger.info("HTTP server closed.");
+                    logger.info("Server shutdown for reason: " + shutdownReason + " complete.");
+                    clearTimeout(forceExitTimer);
+                    setTimeout(() => process.exit(0), 250);
                 });
-
-                logger.info("Server shutdown for reason: " + shutdownReason + " complete.");
-                process.exit(0);
             } else {
+                clearTimeout(forceExitTimer);
                 process.exit(0);
             }
         };

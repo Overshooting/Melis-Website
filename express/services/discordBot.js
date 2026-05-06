@@ -165,6 +165,8 @@ async function updateEmbedForStop(reason) {
     } catch (err) {
         logger.info("Failed to update embed:", err);
         throw err;
+    } finally {
+        logger.info("Finished updating embeds for stop.");
     }
 }
 

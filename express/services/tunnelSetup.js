@@ -45,12 +45,48 @@ function stopTunnel() {
     logger.info("Shutting down clouflared tunnel...");
 
     return new Promise((resolve) => {
-        tunnelProcess.once('exit', () => {
-            logger.info("Cloudflared tunnel fully stopped.");
+        let resolved = false;
+        const finish = (signal) => {
+            if (resolved) return;
+            resolved = true;
+            tunnelProcess = null;
+            logger.info(`Cloudflared tunnel fully stopped.`);
             resolve();
+        };
+
+        if (tunnelProcess.exitCode !== null || tunnelProcess.killed) {
+            finish(tunnelProcess.exitCode !== null ? `code ${tunnelProcess.exitCode}` : '');
+            return;
+        }
+
+        tunnelProcess.once('exit', (code, signal) => {
+            finish(signal || (code !== null ? `code ${code}` : ''));
         });
 
-        tunnelProcess.kill('SIGTERM');
+        const killTimer = setTimeout(() => {
+            try {
+                tunnelProcess.kill('SIGKILL');
+            } catch (error) {
+            }
+        }, 3000);
+
+        const resolveTimer = setTimeout(() => {
+            finish('timeout');
+        }, 4000);
+
+        tunnelProcess.once('close', () => {
+            clearTimeout(killTimer);
+            clearTimeout(resolveTimer);
+            finish();
+        });
+
+        try {
+            tunnelProcess.kill('SIGTERM');
+        } catch (error) {
+            clearTimeout(killTimer);
+            clearTimeout(resolveTimer);
+            finish();
+        }
     });
 }
 
