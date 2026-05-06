@@ -7,6 +7,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const imagePreview = document.getElementById("imagePreview");
     const submitButton = document.getElementById("submitButton");
 
+    async function fetchCSRFToken() {
+        try {
+            const response = await fetch('/api/csrf-token');
+            const data = await response.json();
+            return data.csrfToken;
+        } catch (error) {
+            console.error('Error fetching CSRF token:', error);
+            return null;
+        }
+    }
+
     form.reset();
 
     form.addEventListener("submit", async (event) => {
@@ -32,6 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append("image", file);
         formData.append("artistName", artistName);
         formData.append("artTitle", artTitle);
+
+        const csrfToken = await fetchCSRFToken();
+        if (!csrfToken) {
+            statusMessage.textContent = "Error: Failed to fetch CSRF token.";
+            submitButton.disabled = false;
+            return;
+        }
+        formData.append("csrfToken", csrfToken);
 
         try {
             const response = await fetch("/api/submit-art/upload", {

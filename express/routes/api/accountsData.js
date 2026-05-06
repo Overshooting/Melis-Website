@@ -16,18 +16,19 @@ router.delete('/', async (req, res) => {
     const { username, password }= req.body;
     try {
         const rows = await db.getAccountPassword(username);
-        
+        const GENERIC_ERROR = 'Invalid credentials';
+
         if (rows.length === 0) {
-            return res.status(409).send('Account does not exist');
+            return res.status(409).send(GENERIC_ERROR);
         }
 
         const isValid = await argon2.verify(rows[0].password, password);
         if (!isValid) {
-            return res.status(409).send('Invalid password');
+            return res.status(409).send(GENERIC_ERROR);
         }
 
         await db.deleteAccount(username);
-        
+
         res.status(200).send('Account ' + username + ' deleted successfully');
     } catch (error) {
         res.status(500).send('Error deleting account');

@@ -4,11 +4,31 @@ const path = require('path');
 const db = require('../../database/valorantDB');
 const argon2 = require('argon2');
 
+const MIN_USERNAME_LENGTH = 3;
+const MAX_USERNAME_LENGTH = 50;
+const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_LENGTH = 128;
+
+function validateUsername(username) {
+    if (typeof username !== 'string') return false;
+    if (username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH) return false;
+    return /^[a-zA-Z0-9_.-]+$/.test(username);
+}
+
+function validatePassword(password) {
+    if (typeof password !== 'string') return false;
+    return password.length >= MIN_PASSWORD_LENGTH && password.length <= MAX_PASSWORD_LENGTH;
+}
+
 router.post('/', async (req, res) => {
     const { username, password }= req.body;
 
     if (!username || !password) {
         return res.status(400).send('Username and password are required');
+    }
+
+    if (!validateUsername(username) || !validatePassword(password)) {
+        return res.status(400).send('Username and password do not meet requirements');
     }
 
     try {

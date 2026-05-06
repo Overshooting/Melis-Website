@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Remote Login</title>
+	<link rel="stylesheet" href="/pages/remoteLogin/remoteLogin.css">
+    <link rel="stylesheet" href="/generalStyle.css">
+</head>
+<body>
+    <button id="homeBtn" class="homeBtn">Home</button>
+    <h1>Developer Remote Login</h1>
+	<div id="remoteLoginContainer" class="remoteLoginContainer">
+		<form id="remoteLoginForm" class="remoteLoginForm" action="/api/remote-login" method="post">
+			<label for="adminPassword">Administrator Password</label>
+			<input id="adminPassword" name="adminPassword" type="password" autocomplete="current-password" required>
+
+			<button type="submit">Request Access</button>
+			<p id="remoteLoginStatus" role="status" aria-live="polite"></p>
+		</form>
+		<div id="remoteSession" hidden>
+			<h2>Live Session</h2>
+			<img id="remoteStream" alt="Remote screen" tabindex="0">
+			<button id="remoteDisconnectButton" class="remoteDisconnectButton" type="button">Disconnect</button>
+		</div>
+	</div>
+	<script src="/functions/pages/remoteLogin.js/remoteLogin.js"></script>
+    <script src="/functions/homeButton.js"></script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 const { server, PORT, initializeCors } = require('../server/server');
+const { initRemoteSession } = require('../services/remoteSession');
 const { startTunnel, stopTunnel } = require('../services/tunnelSetup');
 const { logger } = require('../services/customLogger');
 const { initBot, sendStartEmbed, shutdownBot, updateEmbedForStop } = require('../services/discordBot');
@@ -35,32 +36,37 @@ async function startServer() {
             }
         });
 
+        initRemoteSession(httpServer);
+
         let shuttingDown = false;
 
         const shutdown = async (shutdownReason) => {
             if (shuttingDown) return;
+
             shuttingDown = true;
             
             logger.info("Shutting down server...");
             console.log("Shutting down server...");
             
-            if (process.env.NODE_ENV === 'production') {
-                try {
-                    await updateEmbedForStop(shutdownReason);
-                    logger.info("Embeds updated successfully.");
-                } catch (err) {
-                    logger.info(err + "Failed to update stop embed: ");
-                }
+            try {
+                await updateEmbedForStop(shutdownReason);
+                logger.info("Embeds updated successfully.");
+            } catch (err) {
+                logger.info(err + "Failed to update stop embed: ");
             }
             
             await shutdownBot();
-            stopTunnel();
+            await stopTunnel();
             await closeValorantPool();
             await closeWebsitePool();
 
             if (httpServer) {
-                await new Promise((resolve) => httpServer.close(resolve));
+                await new Promise((resolve) => httpServer.close(resolve)).finally(() => {
+                    logger.info("HTTP server closed.");
+                });
+
                 logger.info("Server shutdown for reason: " + shutdownReason + " complete.");
+                process.exit(0);
             } else {
                 process.exit(0);
             }

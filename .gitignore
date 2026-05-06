@@ -5,7 +5,8 @@ express/database
 art_submissions/
 
 # Logs
-logs
+server_logs/
+script_logs/
 submitted_suggestions
 *.log
 npm-debug.log*
@@ -135,5 +136,5 @@ dist
 
 express/routes/website/williamwebsite/
 express/routes/api/williamwebsite/
-website/functions/williamwebsite/
+website/functions/pages/williamwebsite/
 website/pages/williamwebsite/

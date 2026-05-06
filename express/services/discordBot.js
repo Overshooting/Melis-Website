@@ -72,12 +72,13 @@ async function ensureAndFetchChannel(guildId, channelName) {
     return channel;
 }
 
-async function shutdownBot() {
-    if (client) {
-        await client.destroy();
-        logger.info("Discord bot has been shut down.");
-    }
-}
+const shutdownBot = async () => {
+    if (!client) return;
+
+    client.destroy();
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+};
 
 async function sendStartEmbed(domain, reason) {
     if (!client.isReady()) {
@@ -113,6 +114,11 @@ async function sendStartEmbed(domain, reason) {
 }
 
 async function updateEmbedForStop(reason) {
+    if (!client.isReady()) {
+        logger.info('Bot not ready yet!');
+        return;
+    }
+
     const newEmbed = new EmbedBuilder()
         .setColor(0xff0000)
         .setTitle('Melis Website Stopped')
@@ -126,23 +132,33 @@ async function updateEmbedForStop(reason) {
         .setFooter({ text: 'Melis Website Notifier' });
     try {
         logger.info("Updating embeds for stop...");
-        
-        for (const [guildId, { channelId, messageId }] of statusMessages.entries()) {
+
+        for (const guild of client.guilds.cache.values()) {
             try {
-                const channel = await client.channels.fetch(channelId);
-                if (!channel) {
-                    logger.info(`Channel with ID ${channelId} not found for guild ${guildId}. Skipping embed update.`);
-                    await resetChannel(process.env.SERVER_STATUS_CHANNEL_NAME);
+                const channel = await ensureAndFetchChannel(guild.id, process.env.SERVER_STATUS_CHANNEL_NAME);
+                let messageId = statusMessages.get(guild.id)?.messageId || null;
+
+                if (!messageId) {
+                    const recentMessages = await channel.messages.fetch({ limit: 10 });
+                    const statusMessage = recentMessages.find((msg) => {
+                        if (msg.author?.id !== client.user?.id) {
+                            return false;
+                        }
+                        const embedTitle = msg.embeds?.[0]?.title || '';
+                        return embedTitle.includes('Melis Website');
+                    });
+                    messageId = statusMessage?.id || null;
+                }
+
+                if (!messageId) {
+                    logger.info(`No status message found for guild ${guild.id}. Skipping embed update.`);
                     continue;
                 }
+
                 const message = await channel.messages.fetch(messageId);
-                if (!message) {
-                    logger.info(`Message with ID ${messageId} not found in channel ${channelId} for guild ${guildId}. Skipping embed update.`);
-                    continue;
-                }
                 await message.edit({ embeds: [newEmbed] });
             } catch (err) {
-                logger.info(`Failed to update embed for guild ${guildId}:`, err);
+                logger.info(`Failed to update embed for guild ${guild.id}:`, err);
                 throw err;
             }
         }

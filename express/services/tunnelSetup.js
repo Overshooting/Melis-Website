@@ -40,11 +40,19 @@ function startTunnel(localUrl) {
 };
 
 function stopTunnel() {
-    if (tunnelProcess) {
-        logger.info("Shutting down clouflared tunnel...");
+    if (!tunnelProcess) return;
+
+    logger.info("Shutting down clouflared tunnel...");
+
+    return new Promise((resolve) => {
+        tunnelProcess.once('exit', () => {
+            logger.info("Cloudflared tunnel fully stopped.");
+            resolve();
+        });
+
         tunnelProcess.kill('SIGTERM');
-    }
-};
+    });
+}
 
 module.exports = {startTunnel, stopTunnel};
 

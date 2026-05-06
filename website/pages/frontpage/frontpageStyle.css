@@ -47,3 +47,12 @@
 .modSubmissionsButton:hover {
     background-color: #0a7a00;
 }
+
+.remoteLoginButton {
+    background-color: #009688;
+    align-self: center;
+}
+
+.remoteLoginButton:hover {
+    background-color: #00695c;
+}

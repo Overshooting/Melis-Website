@@ -4,9 +4,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const usernameInput = document.getElementById('deleteUsernameInput');
     const passwordInput = document.getElementById('deletePasswordInput');
 
+    async function fetchCSRFToken() {
+        try {
+            const response = await fetch('/api/csrf-token');
+            const data = await response.json();
+            return data.csrfToken;
+        } catch (error) {
+            console.error('Error fetching CSRF token:', error);
+            return null;
+        }
+    }
+
 	if (!btn) return;
 	
-    btn.addEventListener('click', function (e) {
+    btn.addEventListener('click', async function (e) {
 		e.preventDefault();
 
         const username = usernameInput.value.trim();
@@ -14,6 +25,12 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (!username || !password) {
             accountDisplay.textContent = 'Username or password rejected.';
+            return;
+        }
+
+        const csrfToken = await fetchCSRFToken();
+        if (!csrfToken) {
+            accountDisplay.textContent = 'Error: Failed to fetch CSRF token.';
             return;
         }
 
@@ -28,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
             body: JSON.stringify({
                 username: username,
                 password: password,
+                csrfToken: csrfToken,
             }),
         }).then(response => {
             if (response.ok) {

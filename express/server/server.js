@@ -6,6 +6,8 @@ const ratelimit = require('express-rate-limit');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const { logger } = require('../services/customLogger');
+const cookieParser = require('cookie-parser');
+const csurf = require('csurf');
 require('dotenv').config();
 
 const accountsRouter = require('../routes/website/accounts');
@@ -24,6 +26,8 @@ const submissionsRouter = require('../routes/website/modSubmissions');
 const submitArtRouter = require('../routes/website/submitArt');
 const uploadArtRouter = require('../routes/api/submitArt');
 const fetchSubmissionsRouter = require('../routes/api/fetchSubmissions');
+const remoteLoginRouter = require('../routes/website/remoteLogin');
+const remoteLoginApiRouter = require('../routes/api/remoteLogin');
 
 const PORT = process.env.SERVER_PORT || 5000;
 
@@ -57,7 +61,19 @@ const limiter = ratelimit({
 
 server.use(express.static(path.join(__dirname, '../../website')));
 server.use('/mod-submissions/submitted-art', express.static(path.join(__dirname, '../../art_submissions')));
-server.use(helmet());
+server.use(helmet({
+    contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+            "img-src": ["'self'", 'data:'],
+            "object-src": ["'none'"],
+            "frame-ancestors": ["'none'"]
+        },
+    },
+    noSniff: true,
+    xssFilter: true,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+}));
 server.use('/api', limiter);
 
 async function initializeCors(domain) {
@@ -70,12 +86,28 @@ async function initializeCors(domain) {
             }
         },
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        credentials: true,
+        allowedHeaders: ['Content-Type', 'x-csrf-token'],
     };
     
     server.use(cors(corsOptions));
 }
 
+server.use(cookieParser());
 server.use(express.json());
+
+const csrfProtection = csurf({ cookie: {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production',
+}});
+
+server.use(csrfProtection);
+
+// Endpoint to retrieve CSRF token
+server.get('/api/csrf-token', (req, res) => {
+	res.json({ csrfToken: req.csrfToken() });
+});
 
 // API routes
 server.use('/api/accounts/data', dataRouter);
@@ -85,6 +117,7 @@ server.use('/api/accounts/admin-bypass', accountsAdminRouter);
 server.use('/williamwebsite/api/suggestions/submit', submitSuggestionRouter);
 server.use('/api/submit-art/upload', uploadArtRouter);
 server.use('/api/mod-submissions/fetch-submissions', fetchSubmissionsRouter);
+server.use('/api/remote-login', remoteLoginApiRouter);
 
 // Website routes
 server.use('/', homeRouter);
@@ -96,4 +129,6 @@ server.use('/williamwebsite/suggestions', suggestionsRouter);
 server.use('/williamwebsite', williamWebsiteRouter);
 server.use('/mod-submissions', submissionsRouter);
 server.use('/mod-submissions/submit-art', submitArtRouter);
+server.use('/remote-login', remoteLoginRouter);
+
 module.exports = {server, PORT, initializeCors};
