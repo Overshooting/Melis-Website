@@ -1,13 +1,15 @@
 const {
     Client,
-    GatewayIntentBits,
-    ChannelType,
-    PermissionsBitField,
-    EmbedBuilder,
+    Intents,
+    Permissions,
+    MessageEmbed,
 } = require('discord.js');
+const fs = require('fs');
+const path = require('path');
 const { logger } = require('../services/customLogger');
-const { send } = require('node:process');
 require('dotenv').config();
+
+const BOT_PID_FILE = path.join(__dirname, '../../server_logs/discord-bot.pid');
 
 const BotChannels = Object.freeze({
     SERVER_STATUS: process.env.SERVER_STATUS_CHANNEL_NAME,
@@ -19,24 +21,56 @@ const BOT_TOKEN = process.env.BOT_TOKEN;
 const DISCORD_CHANNEL_NAME = process.env.DISCORD_CHANNEL_NAME;
 
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds]
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.MESSAGE_CONTENT,
+    ],
 });
 
 let statusMessages = new Map();
 
+function writeBotPidFile() {
+    try {
+        fs.mkdirSync(path.dirname(BOT_PID_FILE), { recursive: true });
+        fs.writeFileSync(BOT_PID_FILE, String(process.pid), 'utf8');
+    } catch (error) {
+        logger.info('Failed to write Discord bot PID file:', error);
+    }
+}
+
+function removeBotPidFile() {
+    try {
+        if (fs.existsSync(BOT_PID_FILE)) {
+            fs.unlinkSync(BOT_PID_FILE);
+        }
+    } catch (error) {
+        logger.info('Failed to remove Discord bot PID file:', error);
+    }
+}
+
+function isBotReady() {
+    return Boolean(client.user);
+}
+
 async function initBot() {
-    if (client.isReady()) return;
+    if (isBotReady()) return;
 
-    await client.login(BOT_TOKEN);
-
-    await new Promise((resolve) => {
-        client.once('clientReady', () => {
+    await new Promise((resolve, reject) => {
+        const handleReady = () => {
+            writeBotPidFile();
             logger.info(`Discord bot logged in as ${client.user.tag}`);
             resolve();
+        };
+
+        client.once('ready', handleReady);
+
+        client.login(BOT_TOKEN).catch((error) => {
+            logger.error('Failed to log in Discord bot:', error);
+            client.removeListener('ready', handleReady);
+            reject(error);
         });
     });
-
-    
 }
 
 async function ensureAndFetchChannel(guildId, channelName) {
@@ -44,25 +78,25 @@ async function ensureAndFetchChannel(guildId, channelName) {
     const channels = await guild.channels.fetch();
 
     let channel = channels.find(
-        (ch) => ch.name === channelName && ch.type === ChannelType.GuildText
+        (ch) => ch.name === channelName && ch.type === 'GUILD_TEXT'
     );
 
     if (!channel) {
         logger.info(`Channel "${channelName}" not found. Creating...`);
         channel = await guild.channels.create({
             name: channelName,
-            type: ChannelType.GuildText,
+            type: 'GUILD_TEXT',
             permissionOverwrites: [
                 {   
                     id: guild.roles.everyone.id,
-                    allow: [PermissionsBitField.Flags.ViewChannel],
-                    deny: [PermissionsBitField.Flags.SendMessages],
+                    allow: [Permissions.FLAGS.VIEW_CHANNEL],
+                    deny: [Permissions.FLAGS.SEND_MESSAGES],
                 },
                 {
                     id: client.user.id,
                     allow: [
-                        PermissionsBitField.Flags.ViewChannel,
-                        PermissionsBitField.Flags.SendMessages,
+                        Permissions.FLAGS.VIEW_CHANNEL,
+                        Permissions.FLAGS.SEND_MESSAGES,
                     ],
                 },
             ],
@@ -76,21 +110,22 @@ const shutdownBot = async () => {
     if (!client) return;
 
     client.destroy();
+    removeBotPidFile();
 
     await new Promise(resolve => setTimeout(resolve, 1000));
 };
 
-async function sendStartEmbed(domain, reason) {
-    if (!client.isReady()) {
+async function sendStartEmbed(reason) {
+    if (!isBotReady()) {
         logger.info('Bot not ready yet!');
         return;
     }
 
-    const embed = new EmbedBuilder()
+    const embed = new MessageEmbed()
         .setColor(0x00ff88)
         .setTitle('Melis Website Started')
-        .setFields(
-            {name: 'Domain', value: domain, inline: false},
+        .addFields(
+            {name: 'Domain', value: process.env.DOMAIN || `http://localhost:${process.env.SERVER_PORT || 5000}`, inline: false},
             {name: 'Status', value: 'Running', inline: false},
             {name: 'Reason', value: reason, inline: false}
         )
@@ -114,16 +149,16 @@ async function sendStartEmbed(domain, reason) {
 }
 
 async function updateEmbedForStop(reason) {
-    if (!client.isReady()) {
+    if (!isBotReady()) {
         logger.info('Bot not ready yet!');
         return;
     }
 
-    const newEmbed = new EmbedBuilder()
+    const newEmbed = new MessageEmbed()
         .setColor(0xff0000)
         .setTitle('Melis Website Stopped')
         .setDescription('The Melis Website server has been stopped. Be back soon!')
-        .setFields(
+        .addFields(
             {name: 'Domain', value: 'N/A', inline: false},
             {name: 'Status', value: 'Stopped', inline: false},
             {name: 'Reason', value: reason, inline: false}
@@ -171,12 +206,12 @@ async function updateEmbedForStop(reason) {
 }
 
 async function sendDevMessage(content) {
-    if (!client.isReady()) {
+    if (!isBotReady()) {
         logger.info('Bot not ready yet!');
         return;
     }
 
-    const embed = new EmbedBuilder()
+    const embed = new MessageEmbed()
         .setColor(0x0000ff)
         .setTitle('Melis Website Dev Message')
         .setDescription(content)
@@ -195,15 +230,15 @@ async function sendDevMessage(content) {
 }
 
 async function sendSuggestionEmbed(suggestion, name, userIP) {
-    if (!client.isReady()) {
+    if (!isBotReady()) {
         logger.info('Bot not ready yet!');
         return;
     }
 
-    const embed = new EmbedBuilder()
+    const embed = new MessageEmbed()
         .setColor(0x00ff88)
         .setTitle('New Suggestion Submitted')
-        .setFields(
+        .addFields(
             {name: 'Name', value: name, inline: false},
             {name: 'Suggestion', value: suggestion, inline: false},
             {name: 'IP Address', value: userIP, inline: false}
@@ -225,7 +260,7 @@ async function sendSuggestionEmbed(suggestion, name, userIP) {
 }
 
 async function resetAllChannels() {
-    if (!client.isReady()) {
+    if (!isBotReady()) {
         logger.info('Bot not ready yet!');
         return;
     }
@@ -274,7 +309,7 @@ async function resetChannel(channelName) {
         return;
     }
     
-    if (!client.isReady()) {
+    if (!isBotReady()) {
         logger.info('Bot not ready yet!');
         return;
     }

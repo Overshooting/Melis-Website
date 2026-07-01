@@ -1,42 +1,49 @@
 const { server, PORT, initializeCors } = require('../server/server');
-const { initRemoteSession, shutdownRemoteSession } = require('../services/remoteSession');
-const { startTunnel, stopTunnel } = require('../services/tunnelSetup');
 const { logger } = require('../services/customLogger');
 const { initBot, sendStartEmbed, shutdownBot, updateEmbedForStop } = require('../services/discordBot');
 const { closeValorantPool } = require('../database/valorantDB');
 const { closeWebsitePool } = require('../database/melisWebsite');
+const fs = require('fs');
+const path = require('path');
 
 require('dotenv').config();
 
+const BOT_PID_FILE = path.join(__dirname, '../../server_logs/discord-bot.pid');
+
+function writeBotPidFile() {
+    try {
+        fs.mkdirSync(path.dirname(BOT_PID_FILE), { recursive: true });
+        fs.writeFileSync(BOT_PID_FILE, String(process.pid), 'utf8');
+    } catch (error) {
+        logger.info('Failed to write bot PID file from server startup:', error);
+    }
+}
+
 async function startServer() {
-    let domain = `http://localhost:${PORT}`;
+    let domain = process.env.DOMAIN || `http://localhost:${PORT}`;
     let httpServer = null;
     const reason = process.argv[2] || "Standard Initialization";
+
+    writeBotPidFile();
 
     if (process.env.NODE_ENV === 'production') {
         try {
             await initBot();
         } catch (err) {
-            logger.info(err + "Failed to initialize Discord bot:");
+            logger.info(`Failed to initialize Discord bot: ${err?.message || err}`);
         }
     }
 
     try {
-        if (process.env.NODE_ENV === 'production') {
-            domain = await startTunnel(`http://localhost:${PORT}`);
-        }
-
         await initializeCors(domain);
 
         httpServer = server.listen(PORT, '0.0.0.0', async () => {
-            logger.info(`Server is running at ${domain}`);
-            console.log(`Server is running at ${domain}`);
+            logger.info(`Server is running at localhost:${PORT} and accessible at ${domain}`);
+            console.log(`Server is running at localhost:${PORT} and accessible at ${domain}`);
             if (process.env.NODE_ENV === 'production') {
-                await sendStartEmbed(domain, reason);
+                await sendStartEmbed(reason);
             }
         });
-
-        initRemoteSession(httpServer);
 
         let shuttingDown = false;
 
@@ -54,11 +61,9 @@ async function startServer() {
 
             await updateEmbedForStop(shutdownReason);
 
-            await shutdownRemoteSession();
             await shutdownBot();
             await closeValorantPool();
             await closeWebsitePool();
-            await stopTunnel();
 
             if (httpServer) {
                 await new Promise((resolve) => httpServer.close(resolve)).finally(() => {

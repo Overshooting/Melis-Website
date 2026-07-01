@@ -26,8 +26,6 @@ const submissionsRouter = require('../routes/website/modSubmissions');
 const submitArtRouter = require('../routes/website/submitArt');
 const uploadArtRouter = require('../routes/api/submitArt');
 const fetchSubmissionsRouter = require('../routes/api/fetchSubmissions');
-const remoteLoginRouter = require('../routes/website/remoteLogin');
-const remoteLoginApiRouter = require('../routes/api/remoteLogin');
 
 const PORT = process.env.SERVER_PORT || 5000;
 
@@ -117,7 +115,6 @@ server.use('/api/accounts/admin-bypass', accountsAdminRouter);
 server.use('/williamwebsite/api/suggestions/submit', submitSuggestionRouter);
 server.use('/api/submit-art/upload', uploadArtRouter);
 server.use('/api/mod-submissions/fetch-submissions', fetchSubmissionsRouter);
-server.use('/api/remote-login', remoteLoginApiRouter);
 
 // Website routes
 server.use('/', homeRouter);
@@ -129,7 +126,6 @@ server.use('/williamwebsite/suggestions', suggestionsRouter);
 server.use('/williamwebsite', williamWebsiteRouter);
 server.use('/mod-submissions', submissionsRouter);
 server.use('/mod-submissions/submit-art', submitArtRouter);
-server.use('/remote-login', remoteLoginRouter);
 
 server.use(function (err, req, res, next) {
     if (err.code === 'EBADCSRFTOKEN') {
