@@ -28,8 +28,6 @@ const client = new Client({
     ],
 });
 
-let statusMessages = new Map();
-
 function writeBotPidFile() {
     try {
         fs.mkdirSync(path.dirname(BOT_PID_FILE), { recursive: true });
@@ -51,6 +49,39 @@ function removeBotPidFile() {
 
 function isBotReady() {
     return Boolean(client.user);
+}
+
+function getStatusChannelName() {
+    return process.env.SERVER_STATUS_CHANNEL_NAME;
+}
+
+async function findOrCreateStatusMessage(channel, embed) {
+    const recentMessages = await channel.messages.fetch({ limit: 100 });
+    const statusMessages = recentMessages.filter(
+        (message) =>
+            message.author?.id === client.user?.id &&
+            message.embeds?.[0]?.title?.includes('Melis Website')
+    );
+
+    const latestStatusMessage = statusMessages
+        .sort((left, right) => right.createdTimestamp - left.createdTimestamp)
+        .first();
+
+    if (latestStatusMessage) {
+        await latestStatusMessage.edit({ embeds: [embed] });
+
+        for (const message of statusMessages.values()) {
+            if (message.id !== latestStatusMessage.id) {
+                await message.delete().catch((error) => {
+                    logger.info(`Failed to delete duplicate status message ${message.id}:`, error);
+                });
+            }
+        }
+
+        return latestStatusMessage;
+    }
+
+    return channel.send({ embeds: [embed] });
 }
 
 async function initBot() {
@@ -83,11 +114,10 @@ async function ensureAndFetchChannel(guildId, channelName) {
 
     if (!channel) {
         logger.info(`Channel "${channelName}" not found. Creating...`);
-        channel = await guild.channels.create({
-            name: channelName,
+        channel = await guild.channels.create(channelName, {
             type: 'GUILD_TEXT',
             permissionOverwrites: [
-                {   
+                {
                     id: guild.roles.everyone.id,
                     allow: [Permissions.FLAGS.VIEW_CHANNEL],
                     deny: [Permissions.FLAGS.SEND_MESSAGES],
@@ -115,7 +145,7 @@ const shutdownBot = async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 };
 
-async function sendStartEmbed(reason) {
+async function updateEmbedForStart(reason) {
     if (!isBotReady()) {
         logger.info('Bot not ready yet!');
         return;
@@ -134,16 +164,10 @@ async function sendStartEmbed(reason) {
 
     for (const guild of client.guilds.cache.values()) {
         try {
-            const channel = await ensureAndFetchChannel(guild.id, process.env.SERVER_STATUS_CHANNEL_NAME);
-            const sentMessage = await channel.send({ embeds: [embed] });
-            
-            statusMessages.set(guild.id, {
-                channelId: channel.id,
-                messageId: sentMessage.id,
-            });
-
+            const channel = await ensureAndFetchChannel(guild.id, getStatusChannelName());
+            await findOrCreateStatusMessage(channel, embed);
         } catch (err) {
-            logger.info(`Failed to send start embed to guild ${guild.id}:`, err);
+            logger.info(`Failed to update start embed in guild ${guild.id}:`, err);
         }
     }
 }
@@ -170,31 +194,10 @@ async function updateEmbedForStop(reason) {
 
         for (const guild of client.guilds.cache.values()) {
             try {
-                const channel = await ensureAndFetchChannel(guild.id, process.env.SERVER_STATUS_CHANNEL_NAME);
-                let messageId = statusMessages.get(guild.id)?.messageId || null;
-
-                if (!messageId) {
-                    const recentMessages = await channel.messages.fetch({ limit: 10 });
-                    const statusMessage = recentMessages.find((msg) => {
-                        if (msg.author?.id !== client.user?.id) {
-                            return false;
-                        }
-                        const embedTitle = msg.embeds?.[0]?.title || '';
-                        return embedTitle.includes('Melis Website');
-                    });
-                    messageId = statusMessage?.id || null;
-                }
-
-                if (!messageId) {
-                    logger.info(`No status message found for guild ${guild.id}. Skipping embed update.`);
-                    continue;
-                }
-
-                const message = await channel.messages.fetch(messageId);
-                await message.edit({ embeds: [newEmbed] });
+                const channel = await ensureAndFetchChannel(guild.id, getStatusChannelName());
+                await findOrCreateStatusMessage(channel, newEmbed);
             } catch (err) {
                 logger.info(`Failed to update embed for guild ${guild.id}:`, err);
-                throw err;
             }
         }
     } catch (err) {
@@ -337,7 +340,8 @@ async function resetChannel(channelName) {
 
 module.exports = {
     initBot,
-    sendStartEmbed,
+    sendStartEmbed: updateEmbedForStart,
+    updateEmbedForStart,
     shutdownBot,
     updateEmbedForStop,
     sendDevMessage,
