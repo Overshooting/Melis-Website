@@ -19,6 +19,9 @@ const BotChannels = Object.freeze({
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const DISCORD_CHANNEL_NAME = process.env.DISCORD_CHANNEL_NAME;
+const BOT_RETRY_DELAY_MS = 5000;
+const BOT_READY_CHECK_INTERVAL_MS = 1000;
+const BOT_READY_TIMEOUT_MS = 30000;
 
 const client = new Client({
     intents: [
@@ -27,6 +30,13 @@ const client = new Client({
         Intents.FLAGS.MESSAGE_CONTENT,
     ],
 });
+
+let initBotPromise = null;
+let shutdownRequested = false;
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function writeBotPidFile() {
     try {
@@ -53,6 +63,23 @@ function isBotReady() {
 
 function getStatusChannelName() {
     return process.env.SERVER_STATUS_CHANNEL_NAME;
+}
+
+async function waitForBotReady(context, timeoutMs = BOT_READY_TIMEOUT_MS) {
+    const startedAt = Date.now();
+
+    while (!isBotReady()) {
+        if (shutdownRequested) {
+            throw new Error(`Discord bot shutdown requested while ${context}.`);
+        }
+
+        if (Date.now() - startedAt >= timeoutMs) {
+            throw new Error(`Timed out waiting for Discord bot to be ready while ${context}.`);
+        }
+
+        logger.info('Bot not ready yet!');
+        await sleep(BOT_READY_CHECK_INTERVAL_MS);
+    }
 }
 
 async function findOrCreateStatusMessage(channel, embed) {
@@ -87,21 +114,54 @@ async function findOrCreateStatusMessage(channel, embed) {
 async function initBot() {
     if (isBotReady()) return;
 
-    await new Promise((resolve, reject) => {
-        const handleReady = () => {
-            writeBotPidFile();
-            logger.info(`Discord bot logged in as ${client.user.tag}`);
-            resolve();
-        };
+    if (initBotPromise) {
+        return initBotPromise;
+    }
 
-        client.once('ready', handleReady);
+    shutdownRequested = false;
 
-        client.login(BOT_TOKEN).catch((error) => {
-            logger.error('Failed to log in Discord bot:', error);
-            client.removeListener('ready', handleReady);
-            reject(error);
-        });
-    });
+    initBotPromise = (async () => {
+        while (!isBotReady()) {
+            if (shutdownRequested) {
+                throw new Error('Discord bot initialization stopped during shutdown.');
+            }
+
+            try {
+                await new Promise((resolve, reject) => {
+                    const handleReady = () => {
+                        writeBotPidFile();
+                        logger.info(`Discord bot logged in as ${client.user.tag}`);
+                        resolve();
+                    };
+
+                    client.once('ready', handleReady);
+
+                    client.login(BOT_TOKEN).catch((error) => {
+                        client.removeListener('ready', handleReady);
+                        reject(error);
+                    });
+                });
+
+                return;
+            } catch (error) {
+                logger.error('Failed to log in Discord bot:', error);
+
+                if (shutdownRequested) {
+                    throw error;
+                }
+
+                client.destroy();
+                logger.info(`Retrying Discord bot login in ${BOT_RETRY_DELAY_MS / 1000} seconds...`);
+                await sleep(BOT_RETRY_DELAY_MS);
+            }
+        }
+    })();
+
+    try {
+        await initBotPromise;
+    } finally {
+        initBotPromise = null;
+    }
 }
 
 async function ensureAndFetchChannel(guildId, channelName) {
@@ -139,17 +199,15 @@ async function ensureAndFetchChannel(guildId, channelName) {
 const shutdownBot = async () => {
     if (!client) return;
 
+    shutdownRequested = true;
     client.destroy();
     removeBotPidFile();
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await sleep(1000);
 };
 
 async function updateEmbedForStart(reason) {
-    if (!isBotReady()) {
-        logger.info('Bot not ready yet!');
-        return;
-    }
+    await waitForBotReady('updating the start embed');
 
     const embed = new MessageEmbed()
         .setColor(0x00ff88)
@@ -173,10 +231,7 @@ async function updateEmbedForStart(reason) {
 }
 
 async function updateEmbedForStop(reason) {
-    if (!isBotReady()) {
-        logger.info('Bot not ready yet!');
-        return;
-    }
+    await waitForBotReady('updating the stop embed');
 
     const newEmbed = new MessageEmbed()
         .setColor(0xff0000)
@@ -209,10 +264,7 @@ async function updateEmbedForStop(reason) {
 }
 
 async function sendDevMessage(content) {
-    if (!isBotReady()) {
-        logger.info('Bot not ready yet!');
-        return;
-    }
+    await waitForBotReady('sending a dev message');
 
     const embed = new MessageEmbed()
         .setColor(0x0000ff)
@@ -233,10 +285,7 @@ async function sendDevMessage(content) {
 }
 
 async function sendSuggestionEmbed(suggestion, name, userIP) {
-    if (!isBotReady()) {
-        logger.info('Bot not ready yet!');
-        return;
-    }
+    await waitForBotReady('sending a suggestion embed');
 
     const embed = new MessageEmbed()
         .setColor(0x00ff88)
@@ -263,10 +312,7 @@ async function sendSuggestionEmbed(suggestion, name, userIP) {
 }
 
 async function resetAllChannels() {
-    if (!isBotReady()) {
-        logger.info('Bot not ready yet!');
-        return;
-    }
+    await waitForBotReady('resetting all channels');
 
     for (const guild of client.guilds.cache.values()) {
         try {
@@ -312,10 +358,7 @@ async function resetChannel(channelName) {
         return;
     }
     
-    if (!isBotReady()) {
-        logger.info('Bot not ready yet!');
-        return;
-    }
+    await waitForBotReady(`resetting channel ${channelName}`);
 
     for (const guild of client.guilds.cache.values()) {
         try {
